@@ -1,3 +1,333 @@
+#Practical Exam: Data Warehousing and Data Mining (HALIMA-315)
+#Section 1: Data Warehousing (50 Marks)
+#Task 1: Data Warehouse Design (15 Marks)
+#Design a star schema for this data warehouse. Include at least one fact table and 3-4
+dimension tables. 
+import sqlite3
+
+
+   
+# Retail Data Warehouse Project
+
+## Section 1: Data Warehousing (50 Marks)
+
+### Task 1: Data Warehouse Design (15 Marks)
+
+#### 1. Star Schema Design
+
+**Fact Table: SalesFact**
+| Column        | Description                         |
+|---------------|-------------------------------------|
+| SalesID       | Primary key, auto-increment          |
+| CustomerID    | Foreign key to CustomerDim           |
+| ProductID     | Foreign key to ProductDim            |
+| TimeID        | Foreign key to TimeDim               |
+| Quantity      | Number of units sold                 |
+| TotalSales    | Quantity * UnitPrice                 |
+
+**Dimension Tables:**
+
+**CustomerDim**
+| Column      | Description                    |
+|-------------|--------------------------------|
+| CustomerID  | Primary key                    |
+| Name        | Customer name                  |
+| Country     | Customer country               |
+| Email       | Optional                       |
+
+**ProductDim**
+| Column      | Description                    |
+|-------------|--------------------------------|
+| ProductID   | Primary key                    |
+| Name        | Product name                   |
+| Category    | Product category               |
+| Price       | Unit price                     |
+
+**TimeDim**
+| Column      | Description                    |
+|-------------|--------------------------------|
+| TimeID      | Primary key                    |
+| Date        | Full date                      |
+| Month       | Month number                   |
+| Quarter     | Quarter number                 |
+| Year        | Year                           |
+
+**Diagram:**  
+![star_schema_online_retail.png](attachment:star_schema_online_retail.png)
+
+#### 2. Why Star Schema
+The star schema was chosen over a snowflake schema because it provides simpler queries, better performance for read-heavy analytical workloads, and easier aggregation across dimensions, which suits OLAP queries and reporting requirements.
+
+#### 3. SQL CREATE TABLE Statements (SQLite Syntax)
+```sql
+CREATE TABLE CustomerDim (
+    CustomerID INTEGER PRIMARY KEY,
+    Name TEXT,
+    Country TEXT,
+    Email TEXT
+);
+
+CREATE TABLE ProductDim (
+    ProductID INTEGER PRIMARY KEY,
+    Name TEXT,
+    Category TEXT,
+    Price REAL
+);
+
+CREATE TABLE TimeDim (
+    TimeID INTEGER PRIMARY KEY,
+    Date TEXT,
+    Month INTEGER,
+    Quarter INTEGER,
+    Year INTEGER
+);
+
+CREATE TABLE SalesFact (
+    SalesID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CustomerID INTEGER,
+    ProductID INTEGER,
+    TimeID INTEGER,
+    Quantity INTEGER,
+    TotalSales REAL,
+    FOREIGN KEY (CustomerID) REFERENCES CustomerDim(CustomerID),
+    FOREIGN KEY (ProductID) REFERENCES ProductDim(ProductID),
+    FOREIGN KEY (TimeID) REFERENCES TimeDim(TimeID)
+);
+
+##Task 2: ETL Process Implementation (20 Marks)
+## Step 1 — Extract
+## What we do:
+* Read the dataset (Online_Retail.csv) from disk into a pandas DataFrame.
+* Remove rows missing essential values:
+* InvoiceNo → needed to identify transactions.
+* StockCode → product identification.
+* Quantity and UnitPrice → required for sales calculations.
+* InvoiceDate → needed for time-based analysis.
+* Convert InvoiceDate to a proper datetime type so we can filter and group by time later.
+* Remove any rows where the date could not be parsed.
+
+## Why we do it:
+* Ensures we are working only with valid, complete data before transformations.
+* Makes sure the InvoiceDate column is in a format that allows filtering and aggregations.
+* Avoids issues in later steps from missing or invalid values.
+import zipfile
+import pandas as pd
+
+# Correct path to your ZIP file
+zip_path = r"C:\Users\Salma\Downloads\online+retail.zip"
+
+# Inspect ZIP contents
+with zipfile.ZipFile(zip_path, 'r') as z:
+    print("Files in zip:", z.namelist())
+
+# Read the Excel inside the ZIP
+excel_name = z.namelist()[0]
+with zipfile.ZipFile(zip_path) as z:
+    with z.open(excel_name) as f:
+        df = pd.read_excel(f)
+
+# Take a random sample of 1000 rows
+df_sample = df.sample(n=1000, random_state=42)
+
+print(df_sample.head())
+print(df_sample.info())
+
+<img width="960" height="540" alt="image" src="https://github.com/user-attachments/assets/2cf11847-04e5-4e6f-9e8b-e87636386a93" />
+
+## Step 2 — Transform
+## What we do:
+* Remove invalid transactions:
+* Negative or zero Quantity values.
+* Zero or negative UnitPrice.
+* Create a new column:
+* TotalSales = Quantity * UnitPrice → This is the key sales measure.
+* Filter transactions to the last year relative to 2025-08-12 (exam requirement).
+* Create dimension-like tables:
+* CustomerDim: unique CustomerID and Country.
+* TimeDim: unique dates with TimeID, Month, Quarter, Year for time-based OLAP.
+* Prepare fact table:
+* SalesFact: contains CustomerID, TimeID, Quantity, and TotalSales.
+
+## Why we do it:
+* Removes bad data so our metrics are accurate.
+* Adds new calculated metrics for reporting.
+* Structures the data into star schema format to make OLAP queries easier in Task 3.
+* Filters for recent transactions to keep analysis relevant and within the scope.
+
+# Add TotalSales
+df_sample['TotalSales'] = df_sample['Quantity'] * df_sample['UnitPrice']
+
+# Customer Dimension
+customer_dim = df_sample.groupby('CustomerID').agg({
+    'Country': 'first',
+    'TotalSales': 'sum'
+}).reset_index()
+
+# Time Dimension
+time_dim = df_sample[['InvoiceDate']].drop_duplicates().reset_index(drop=True)
+time_dim['TimeID'] = time_dim.index + 1
+time_dim['Date'] = time_dim['InvoiceDate']
+time_dim['Month'] = time_dim['InvoiceDate'].dt.month
+time_dim['Quarter'] = time_dim['InvoiceDate'].dt.quarter
+time_dim['Year'] = time_dim['InvoiceDate'].dt.year
+time_dim = time_dim.drop(columns=['InvoiceDate'])
+
+# Map TimeID to SalesFact
+df_sample = df_sample.merge(time_dim[['Date','TimeID']], left_on='InvoiceDate', right_on='Date', how='left')
+sales_fact = df_sample[['CustomerID','TimeID','Quantity','TotalSales']].copy()
+
+## Step 3 — Load
+## What we do:
+* Connect to a SQLite database (retail_dw.db).
+* Create tables:
+* CustomerDim
+* TimeDim
+* SalesFact
+* Load the cleaned/transformed data into these tables.
+* Enforce foreign key constraints to maintain referential integrity.
+
+## Why we do it:
+* Moves data into a data warehouse structure for analysis.
+* Allows running SQL queries efficiently in later steps (Task 3).
+* Ensures we follow proper relational database design.
+# 4. Load into SQLite
+# -----------------------------
+db_name = "retail_dw_sample.db"
+conn = sqlite3.connect(db_name)
+cursor = conn.cursor()
+
+# Drop tables if they exist
+cursor.executescript("""
+DROP TABLE IF EXISTS SalesFact;
+DROP TABLE IF EXISTS TimeDim;
+DROP TABLE IF EXISTS CustomerDim;
+""")
+
+# Create tables
+cursor.executescript("""
+CREATE TABLE CustomerDim (
+    CustomerID INTEGER PRIMARY KEY,
+    Country TEXT,
+    TotalSales REAL
+);
+
+CREATE TABLE TimeDim (
+    TimeID INTEGER PRIMARY KEY,
+    Date TEXT,
+    Month INTEGER,
+    Quarter INTEGER,
+    Year INTEGER
+);
+
+CREATE TABLE SalesFact (
+    SalesID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CustomerID INTEGER,
+    TimeID INTEGER,
+    Quantity INTEGER,
+    TotalSales REAL,
+    FOREIGN KEY (CustomerID) REFERENCES CustomerDim(CustomerID),
+    FOREIGN KEY (TimeID) REFERENCES TimeDim(TimeID)
+);
+""")
+
+# Insert data
+customer_dim.to_sql('CustomerDim', conn, if_exists='append', index=False)
+time_dim.to_sql('TimeDim', conn, if_exists='append', index=False)
+sales_fact.to_sql('SalesFact', conn, if_exists='append', index=False)
+
+conn.commit()
+conn.close()
+
+print(f"[ETL] Completed: {db_name} created with:")
+print("CustomerDim rows:", len(customer_dim))
+print("TimeDim rows:", len(time_dim))
+print("SalesFact rows:", len(sales_fact))
+<img width="960" height="282" alt="image" src="https://github.com/user-attachments/assets/e3e6ac08-6b33-4ab2-b66f-d0cd293e5b27" />
+import sqlite3
+conn = sqlite3.connect("retail_dw_sample.db")
+cursor = conn.cursor()
+
+cursor.execute("SELECT * FROM CustomerDim LIMIT 5")
+print(cursor.fetchall())
+
+cursor.execute("SELECT * FROM SalesFact LIMIT 5")
+print(cursor.fetchall())
+
+conn.close()
+<img width="960" height="249" alt="image" src="https://github.com/user-attachments/assets/e08e391b-b922-44e9-9c9c-6728d494e5f7" />
+
+##Task 3: OLAP Queries and Analysis (15 Marks)
+## 1. OLAP Queries
+Roll-up – total sales by Country and Quarter
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Connect to your sample DB
+conn = sqlite3.connect("retail_dw_sample.db")
+
+# --- 1. Roll-up: Total sales by country and quarter ---
+rollup_query = """
+SELECT c.Country, t.Quarter, SUM(s.TotalSales) AS TotalSales
+FROM SalesFact s
+JOIN CustomerDim c ON s.CustomerID = c.CustomerID
+JOIN TimeDim t ON s.TimeID = t.TimeID
+GROUP BY c.Country, t.Quarter
+ORDER BY c.Country, t.Quarter;
+"""
+rollup = pd.read_sql_query(rollup_query, conn)
+print("Roll-up (Country x Quarter):")
+print(rollup)
+
+<img width="545" height="420" alt="image" src="https://github.com/user-attachments/assets/6300cd08-da6a-43f0-af1d-6292aca5931f" />
+
+## Drill-down – monthly sales for UK
+# --- 2. Drill-down: Sales details for a specific country (e.g., United Kingdom) by month ---
+drilldown_query = """
+SELECT t.Month, SUM(s.TotalSales) AS TotalSales
+FROM SalesFact s
+JOIN CustomerDim c ON s.CustomerID = c.CustomerID
+JOIN TimeDim t ON s.TimeID = t.TimeID
+WHERE c.Country = 'United Kingdom'
+GROUP BY t.Month
+ORDER BY t.Month;
+"""
+drilldown = pd.read_sql_query(drilldown_query, conn)
+print("\nDrill-down (UK Sales by Month):")
+print(drilldown)
+<img width="336" height="217" alt="image" src="https://github.com/user-attachments/assets/92228315-85eb-458c-bd3e-e44b82abc243" />
+
+## Slice – total sales for Electronics category
+# For this sample, let's assume Description contains the word 'ELECTRONICS' for filtering
+slice_query = """
+SELECT SUM(TotalSales) AS TotalSales
+FROM SalesFact
+WHERE Description LIKE '%ELECTRONICS%';
+"""
+slice_result = pd.read_sql_query(slice_query, conn)
+print("\nSlice (Electronics Sales):")
+print(slice_result)
+
+conn.close()
+<img width="835" height="286" alt="image" src="https://github.com/user-attachments/assets/8cd4bed8-5d9b-4095-abba-9abd5a271755" />
+
+## 2. Visualization Example – bar chart for roll-up result
+plt.figure(figsize=(10,6))
+for country in rollup['Country'].unique():
+    data = rollup[rollup['Country'] == country]
+    plt.bar(data['Quarter'] + 0.1*list(rollup['Country'].unique()).index(country), data['TotalSales'], width=0.1, label=country)
+plt.xlabel('Quarter')
+plt.ylabel('Total Sales')
+plt.title('Total Sales by Country and Quarter')
+plt.legend()
+plt.tight_layout()
+plt.savefig("sales_by_country_quarter.png")
+plt.show()
+<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/bf313753-c800-4728-92b9-ee7b55cf5b11" />
+
+
+
+
+
 # Data Mining Project
 
 ## Project Overview
