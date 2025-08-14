@@ -265,22 +265,6 @@ conn.close()
 
 
 
-## 2. Visualization Example – bar chart for roll-up result
-
-```
-plt.figure(figsize=(10,6))
-for country in rollup['Country'].unique():
-    data = rollup[rollup['Country'] == country]
-    plt.bar(data['Quarter'] + 0.1*list(rollup['Country'].unique()).index(country), data['TotalSales'], width=0.1, label=country)
-plt.xlabel('Quarter')
-plt.ylabel('Total Sales')
-plt.title('Total Sales by Country and Quarter')
-plt.legend()
-plt.tight_layout()
-plt.savefig("sales_by_country_quarter.png")
-plt.show()
-```
-<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/bf313753-c800-4728-92b9-ee7b55cf5b11" />
 
 
 
@@ -330,7 +314,6 @@ data_mining_project/
 ├── synthetic_transactions.csv # Optional: saved generated baskets
 
 
----
 
 ## Task 1: Data Preprocessing and Exploration
 
