@@ -1,7 +1,7 @@
-###Practical Exam: Data Warehousing and Data Mining (HALIMA-315)
-##Section 1: Data Warehousing (50 Marks)
-#Task 1: Data Warehouse Design (15 Marks)
-#Design a star schema for this data warehouse. Include at least one fact table and 3-4
+### Practical Exam: Data Warehousing and Data Mining (HALIMA-315)
+## Section 1: Data Warehousing (50 Marks)
+# Task 1: Data Warehouse Design (15 Marks)
+# Design a star schema for this data warehouse. Include at least one fact table and 3-4
 dimension tables. 
 import sqlite3
 
@@ -153,6 +153,7 @@ print(df_sample.info())
 * Adds new calculated metrics for reporting.
 * Structures the data into star schema format to make OLAP queries easier in Task 3.
 * Filters for recent transactions to keep analysis relevant and within the scope.
+  
 ```
 # Add TotalSales
 df_sample['TotalSales'] = df_sample['Quantity'] * df_sample['UnitPrice']
@@ -175,6 +176,7 @@ time_dim = time_dim.drop(columns=['InvoiceDate'])
 # Map TimeID to SalesFact
 df_sample = df_sample.merge(time_dim[['Date','TimeID']], left_on='InvoiceDate', right_on='Date', how='left')
 sales_fact = df_sample[['CustomerID','TimeID','Quantity','TotalSales']].copy()
+
 ```
 ## Step 3 — Load
 ## What we do:
@@ -190,6 +192,7 @@ sales_fact = df_sample[['CustomerID','TimeID','Quantity','TotalSales']].copy()
 * Moves data into a data warehouse structure for analysis.
 * Allows running SQL queries efficiently in later steps (Task 3).
 * Ensures we follow proper relational database design.
+  
 ```
 # 4. Load into SQLite
 # -----------------------------
@@ -259,7 +262,7 @@ print(cursor.fetchall())
 conn.close()
 <img width="960" height="249" alt="image" src="https://github.com/user-attachments/assets/e08e391b-b922-44e9-9c9c-6728d494e5f7" />
 
-##Task 3: OLAP Queries and Analysis (15 Marks)
+## Task 3: OLAP Queries and Analysis (15 Marks)
 ## 1. OLAP Queries
 Roll-up – total sales by Country and Quarter
 ```
