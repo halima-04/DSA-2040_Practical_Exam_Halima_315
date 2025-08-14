@@ -1,19 +1,19 @@
-Data Mining Project README
-Project Overview
+ ## Data Mining Project README
+## Project Overview
 
 This project demonstrates a complete data mining workflow on the Iris dataset (from scikit-learn) and synthetic transactional data for association rule mining. The project covers data preprocessing, exploratory data analysis, clustering, classification, and association rules, using Python libraries such as pandas, scikit-learn, seaborn, matplotlib, and mlxtend.
 
 The primary objectives are:
 
-To preprocess and explore the Iris dataset.
+* To preprocess and explore the Iris dataset.
 
-To perform K-Means clustering and evaluate cluster quality.
+* To perform K-Means clustering and evaluate cluster quality.
 
-To train and compare Decision Tree and KNN classifiers.
+* To train and compare Decision Tree and KNN classifiers.
 
-To generate synthetic transactional data and extract association rules using the Apriori algorithm.
+* To generate synthetic transactional data and extract association rules using the Apriori algorithm.
 
-To visualize results and interpret findings for potential real-world applications.
+* To visualize results and interpret findings for potential real-world applications.
 
 Project Structure
 data_mining_project/
@@ -31,7 +31,7 @@ data_mining_project/
 ├── README.md                     # Project documentation (this file)
 ├── synthetic_transactions.csv    # Optional: saved generated baskets
 
-Task 1: Data Preprocessing and Exploration
+## Task 1: Data Preprocessing and Exploration
 
 Objective: Prepare the Iris dataset for analysis and modeling.
 
@@ -59,10 +59,9 @@ Exploratory Data Analysis (EDA):
 
 Computed descriptive statistics: mean, standard deviation, min, max using pandas.describe().
 
-Visualizations:
+## Visualizations:
 
 Pairplot to examine relationships between features and species.
-
 Correlation heatmap to check feature correlations.
 
 Boxplots to identify potential outliers.
