@@ -1,5 +1,18 @@
 ### Practical Exam: Data Warehousing and Data Mining (HALIMA-315)
 ## Section 1: Data Warehousing (50 Marks)
+## Introduction
+
+This project involves designing and implementing a data warehouse for a retail company that sells products across multiple categories, including electronics and clothing. The data warehouse captures sales transactions, customer information, product details, and time-based data to support business analytics. The main goal is to enable efficient decision-making through Online Analytical Processing (OLAP) queries such as total sales by product category per quarter, customer demographics analysis, and inventory trends.
+
+The project is divided into three main tasks:
+1. **Data Warehouse Design** – creating a star schema with fact and dimension tables to organize sales, customer, product, and time data.
+2. **ETL Process Implementation** – extracting, transforming, and loading data (from CSV or synthetic generation) into the warehouse, including calculated measures and dimension tables.
+3. **OLAP Queries and Analysis** – performing roll-up, drill-down, and slice operations to analyze sales patterns, visualize results, and interpret insights for business decision-making.
+
+This project demonstrates the end-to-end workflow of data warehousing, from schema design and ETL to advanced analytics using Python and SQLite.
+
+
+
 # Task 1: Data Warehouse Design (15 Marks)
 
 
