@@ -15,18 +15,31 @@ The primary objectives are:
 ## Project Structure
 
 data_mining_project/
+
 │
+
 ├── preprocessing_iris.py # Data preprocessing and exploration
+
 ├── clustering_iris.py # K-Means clustering implementation
+
 ├── classification_iris.py # Classification (Decision Tree & KNN)
+
 ├── mining_iris_basket.py # Synthetic transaction generation + Apriori rules
+
 ├── images/ # Folder containing visualizations
+
 │ ├── pairplot.png
+
 │ ├── correlation_heatmap.png
+
 │ ├── kmeans_clusters_scatter.png
+
 │ ├── kmeans_elbow_curve.png
+
 │ ├── decision_tree.png
-├── README.md # Project documentation (this file)
+
+├── README.md # Project documentation 
+
 ├── synthetic_transactions.csv # Optional: saved generated baskets
 
 
