@@ -260,10 +260,6 @@ cursor.execute("SELECT * FROM SalesFact LIMIT 5")
 print(cursor.fetchall())
 ```
 conn.close()
-<img width="960" height="249" alt="image" src="https://github.com/user-attachments/assets/e08e391b-b922-44e9-9c9c-6728d494e5f7" />
-
-
-
 
 
 
