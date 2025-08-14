@@ -264,15 +264,13 @@ conn.close()
 
 ## Task 3: OLAP Queries and Analysis (15 Marks)
 ## 1. OLAP Queries
-Roll-up – total sales by Country and Quarter
 
+Roll-up – total sales by Country and Quarter
 ```
 import pandas as pd
 import matplotlib.pyplot as plt
-
 # Connect to your sample DB
 conn = sqlite3.connect("retail_dw_sample.db")
-
 # --- 1. Roll-up: Total sales by country and quarter ---
 rollup_query = """
 SELECT c.Country, t.Quarter, SUM(s.TotalSales) AS TotalSales
