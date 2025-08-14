@@ -248,8 +248,8 @@ print("TimeDim rows:", len(time_dim))
 print("SalesFact rows:", len(sales_fact))
 ```
 <img width="960" height="282" alt="image" src="https://github.com/user-attachments/assets/e3e6ac08-6b33-4ab2-b66f-d0cd293e5b27" />
-```
-import sqlite3
+
+```import sqlite3
 conn = sqlite3.connect("retail_dw_sample.db")
 cursor = conn.cursor()
 
