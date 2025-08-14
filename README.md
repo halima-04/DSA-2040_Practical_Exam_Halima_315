@@ -2,9 +2,6 @@
 ## Section 1: Data Warehousing (50 Marks)
 # Task 1: Data Warehouse Design (15 Marks)
 # Design a star schema for this data warehouse. Include at least one fact table and 3-4
-dimension tables. 
-import sqlite3
-
 
    
 # Retail Data Warehouse Project
