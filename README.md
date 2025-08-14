@@ -285,7 +285,11 @@ rollup = pd.read_sql_query(rollup_query, conn)
 print("Roll-up (Country x Quarter):")
 print(rollup)
 ```
+
+
 <img width="545" height="420" alt="image" src="https://github.com/user-attachments/assets/6300cd08-da6a-43f0-af1d-6292aca5931f" />
+
+
 
 ## Drill-down – monthly sales for UK
 ```
@@ -306,6 +310,8 @@ print(drilldown)
 
 <img width="336" height="217" alt="image" src="https://github.com/user-attachments/assets/92228315-85eb-458c-bd3e-e44b82abc243" />
 
+
+
 ## Slice – total sales for Electronics category
 ```
 # For this sample, let's assume Description contains the word 'ELECTRONICS' for filtering
@@ -322,6 +328,8 @@ conn.close()
 ```
 
 <img width="835" height="286" alt="image" src="https://github.com/user-attachments/assets/8cd4bed8-5d9b-4095-abba-9abd5a271755" />
+
+
 
 ## 2. Visualization Example – bar chart for roll-up result
 
