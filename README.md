@@ -262,6 +262,86 @@ conn.close()
 ```
 
 
+## 1. OLAP Queries
+Roll-up – total sales by Country and Quarter
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Connect to your sample DB
+conn = sqlite3.connect("retail_dw_sample.db")
+
+# --- 1. Roll-up: Total sales by country and quarter ---
+rollup_query = """
+SELECT c.Country, t.Quarter, SUM(s.TotalSales) AS TotalSales
+FROM SalesFact s
+JOIN CustomerDim c ON s.CustomerID = c.CustomerID
+JOIN TimeDim t ON s.TimeID = t.TimeID
+GROUP BY c.Country, t.Quarter
+ORDER BY c.Country, t.Quarter;
+"""
+rollup = pd.read_sql_query(rollup_query, conn)
+print("Roll-up (Country x Quarter):")
+print(rollup)
+```
+<img width="1920" height="1080" alt="Screenshot 2025-08-14 221017" src="https://github.com/user-attachments/assets/f97081b5-da76-425c-b10c-9b6715d40b2e" />
+
+## Drill-down – monthly sales for UK
+```
+# --- 2. Drill-down: Sales details for a specific country (e.g., United Kingdom) by month ---
+drilldown_query = """
+SELECT t.Month, SUM(s.TotalSales) AS TotalSales
+FROM SalesFact s
+JOIN CustomerDim c ON s.CustomerID = c.CustomerID
+JOIN TimeDim t ON s.TimeID = t.TimeID
+WHERE c.Country = 'United Kingdom'
+GROUP BY t.Month
+ORDER BY t.Month;
+"""
+drilldown = pd.read_sql_query(drilldown_query, conn)
+print("\nDrill-down (UK Sales by Month):")
+print(drilldown)
+```
+
+<img width="1920" height="1080" alt="Screenshot 2025-08-14 221144" src="https://github.com/user-attachments/assets/27d0a54a-af52-42c0-8db4-e964fba2b607" />
+
+
+## Slice – total sales for Electronics category
+```
+# For this sample, let's assume Description contains the word 'ELECTRONICS' for filtering
+slice_query = """
+SELECT SUM(TotalSales) AS TotalSales
+FROM SalesFact
+WHERE Description LIKE '%ELECTRONICS%';
+"""
+slice_result = pd.read_sql_query(slice_query, conn)
+print("\nSlice (Electronics Sales):")
+print(slice_result)
+
+conn.close()
+```
+
+
+<img width="1920" height="539" alt="image" src="https://github.com/user-attachments/assets/692530eb-0e40-4f7a-bdbd-a43613a82c03" />
+
+
+## 2. Visualization Example – bar chart for roll-up result
+```
+plt.figure(figsize=(10,6))
+for country in rollup['Country'].unique():
+    data = rollup[rollup['Country'] == country]
+    plt.bar(data['Quarter'] + 0.1*list(rollup['Country'].unique()).index(country), data['TotalSales'], width=0.1, label=country)
+plt.xlabel('Quarter')
+plt.ylabel('Total Sales')
+plt.title('Total Sales by Country and Quarter')
+plt.legend()
+plt.tight_layout()
+plt.savefig("sales_by_country_quarter.png")
+plt.show()
+```
+
+<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/414a53a8-e6f2-4a84-85e5-b020508f9f5e" />
+
 
 
    ###  Data Mining Project
