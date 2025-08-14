@@ -1,5 +1,5 @@
-#Practical Exam: Data Warehousing and Data Mining (HALIMA-315)
-#Section 1: Data Warehousing (50 Marks)
+###Practical Exam: Data Warehousing and Data Mining (HALIMA-315)
+##Section 1: Data Warehousing (50 Marks)
 #Task 1: Data Warehouse Design (15 Marks)
 #Design a star schema for this data warehouse. Include at least one fact table and 3-4
 dimension tables. 
@@ -93,7 +93,7 @@ CREATE TABLE SalesFact (
     FOREIGN KEY (ProductID) REFERENCES ProductDim(ProductID),
     FOREIGN KEY (TimeID) REFERENCES TimeDim(TimeID)
 );
-
+```
 ##Task 2: ETL Process Implementation (20 Marks)
 ## Step 1 — Extract
 ## What we do:
@@ -112,7 +112,7 @@ CREATE TABLE SalesFact (
 * Avoids issues in later steps from missing or invalid values.
 import zipfile
 import pandas as pd
-
+```
 # Correct path to your ZIP file
 zip_path = r"C:\Users\Salma\Downloads\online+retail.zip"
 
@@ -131,7 +131,7 @@ df_sample = df.sample(n=1000, random_state=42)
 
 print(df_sample.head())
 print(df_sample.info())
-
+```
 <img width="960" height="540" alt="image" src="https://github.com/user-attachments/assets/2cf11847-04e5-4e6f-9e8b-e87636386a93" />
 
 ## Step 2 — Transform
@@ -153,7 +153,7 @@ print(df_sample.info())
 * Adds new calculated metrics for reporting.
 * Structures the data into star schema format to make OLAP queries easier in Task 3.
 * Filters for recent transactions to keep analysis relevant and within the scope.
-
+```
 # Add TotalSales
 df_sample['TotalSales'] = df_sample['Quantity'] * df_sample['UnitPrice']
 
@@ -175,7 +175,7 @@ time_dim = time_dim.drop(columns=['InvoiceDate'])
 # Map TimeID to SalesFact
 df_sample = df_sample.merge(time_dim[['Date','TimeID']], left_on='InvoiceDate', right_on='Date', how='left')
 sales_fact = df_sample[['CustomerID','TimeID','Quantity','TotalSales']].copy()
-
+```
 ## Step 3 — Load
 ## What we do:
 * Connect to a SQLite database (retail_dw.db).
@@ -190,6 +190,7 @@ sales_fact = df_sample[['CustomerID','TimeID','Quantity','TotalSales']].copy()
 * Moves data into a data warehouse structure for analysis.
 * Allows running SQL queries efficiently in later steps (Task 3).
 * Ensures we follow proper relational database design.
+```
 # 4. Load into SQLite
 # -----------------------------
 db_name = "retail_dw_sample.db"
@@ -242,7 +243,9 @@ print(f"[ETL] Completed: {db_name} created with:")
 print("CustomerDim rows:", len(customer_dim))
 print("TimeDim rows:", len(time_dim))
 print("SalesFact rows:", len(sales_fact))
+```
 <img width="960" height="282" alt="image" src="https://github.com/user-attachments/assets/e3e6ac08-6b33-4ab2-b66f-d0cd293e5b27" />
+```
 import sqlite3
 conn = sqlite3.connect("retail_dw_sample.db")
 cursor = conn.cursor()
@@ -252,13 +255,14 @@ print(cursor.fetchall())
 
 cursor.execute("SELECT * FROM SalesFact LIMIT 5")
 print(cursor.fetchall())
-
+```
 conn.close()
 <img width="960" height="249" alt="image" src="https://github.com/user-attachments/assets/e08e391b-b922-44e9-9c9c-6728d494e5f7" />
 
 ##Task 3: OLAP Queries and Analysis (15 Marks)
 ## 1. OLAP Queries
 Roll-up – total sales by Country and Quarter
+```
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -277,11 +281,12 @@ ORDER BY c.Country, t.Quarter;
 rollup = pd.read_sql_query(rollup_query, conn)
 print("Roll-up (Country x Quarter):")
 print(rollup)
-
+```
 <img width="545" height="420" alt="image" src="https://github.com/user-attachments/assets/6300cd08-da6a-43f0-af1d-6292aca5931f" />
 
 ## Drill-down – monthly sales for UK
 # --- 2. Drill-down: Sales details for a specific country (e.g., United Kingdom) by month ---
+```
 drilldown_query = """
 SELECT t.Month, SUM(s.TotalSales) AS TotalSales
 FROM SalesFact s
@@ -294,10 +299,12 @@ ORDER BY t.Month;
 drilldown = pd.read_sql_query(drilldown_query, conn)
 print("\nDrill-down (UK Sales by Month):")
 print(drilldown)
+```
 <img width="336" height="217" alt="image" src="https://github.com/user-attachments/assets/92228315-85eb-458c-bd3e-e44b82abc243" />
 
 ## Slice – total sales for Electronics category
 # For this sample, let's assume Description contains the word 'ELECTRONICS' for filtering
+```
 slice_query = """
 SELECT SUM(TotalSales) AS TotalSales
 FROM SalesFact
@@ -308,9 +315,11 @@ print("\nSlice (Electronics Sales):")
 print(slice_result)
 
 conn.close()
+```
 <img width="835" height="286" alt="image" src="https://github.com/user-attachments/assets/8cd4bed8-5d9b-4095-abba-9abd5a271755" />
 
 ## 2. Visualization Example – bar chart for roll-up result
+```
 plt.figure(figsize=(10,6))
 for country in rollup['Country'].unique():
     data = rollup[rollup['Country'] == country]
@@ -322,6 +331,7 @@ plt.legend()
 plt.tight_layout()
 plt.savefig("sales_by_country_quarter.png")
 plt.show()
+```
 <img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/bf313753-c800-4728-92b9-ee7b55cf5b11" />
 
 
