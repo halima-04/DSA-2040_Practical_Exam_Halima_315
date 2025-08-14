@@ -264,13 +264,14 @@ conn.close()
 
 ## Task 3: OLAP Queries and Analysis (15 Marks)
 ## 1. OLAP Queries
-
-Roll-up – total sales by Country and Quarter
+# Roll-up – total sales by Country and Quarter
 ```
 import pandas as pd
 import matplotlib.pyplot as plt
+
 # Connect to your sample DB
 conn = sqlite3.connect("retail_dw_sample.db")
+
 # --- 1. Roll-up: Total sales by country and quarter ---
 rollup_query = """
 SELECT c.Country, t.Quarter, SUM(s.TotalSales) AS TotalSales
@@ -284,13 +285,11 @@ rollup = pd.read_sql_query(rollup_query, conn)
 print("Roll-up (Country x Quarter):")
 print(rollup)
 ```
-
 <img width="545" height="420" alt="image" src="https://github.com/user-attachments/assets/6300cd08-da6a-43f0-af1d-6292aca5931f" />
 
 ## Drill-down – monthly sales for UK
-# --- 2. Drill-down: Sales details for a specific country (e.g., United Kingdom) by month ---
-
 ```
+# 2. Drill-down: Sales details for a specific country (e.g., United Kingdom) by month ---
 drilldown_query = """
 SELECT t.Month, SUM(s.TotalSales) AS TotalSales
 FROM SalesFact s
@@ -308,9 +307,8 @@ print(drilldown)
 <img width="336" height="217" alt="image" src="https://github.com/user-attachments/assets/92228315-85eb-458c-bd3e-e44b82abc243" />
 
 ## Slice – total sales for Electronics category
-# For this sample, let's assume Description contains the word 'ELECTRONICS' for filtering
-
 ```
+# For this sample, let's assume Description contains the word 'ELECTRONICS' for filtering
 slice_query = """
 SELECT SUM(TotalSales) AS TotalSales
 FROM SalesFact
@@ -327,7 +325,8 @@ conn.close()
 
 ## 2. Visualization Example – bar chart for roll-up result
 
-```plt.figure(figsize=(10,6))
+```
+plt.figure(figsize=(10,6))
 for country in rollup['Country'].unique():
     data = rollup[rollup['Country'] == country]
     plt.bar(data['Quarter'] + 0.1*list(rollup['Country'].unique()).index(country), data['TotalSales'], width=0.1, label=country)
@@ -344,7 +343,7 @@ plt.show()
 
 
 
-### Data Mining Project
+   ###  Data Mining Project
 
 ## Project Overview
 This project demonstrates a complete data mining workflow on the **Iris dataset** (from scikit-learn) and **synthetic transactional data** for association rule mining. The project covers **data preprocessing, exploratory data analysis, clustering, classification, and association rules**, using Python libraries such as **pandas, scikit-learn, seaborn, matplotlib, and mlxtend**.
