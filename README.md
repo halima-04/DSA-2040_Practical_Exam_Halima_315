@@ -53,7 +53,8 @@ import sqlite3
 | Year        | Year                           |
 
 **Diagram:**  
-![star_schema_online_retail.png](attachment:star_schema_online_retail.png)
+
+<img width="434" height="312" alt="image" src="https://github.com/user-attachments/assets/31503909-41e1-484c-be6d-bc0a7b0c4607" />
 
 #### 2. Why Star Schema
 The star schema was chosen over a snowflake schema because it provides simpler queries, better performance for read-heavy analytical workloads, and easier aggregation across dimensions, which suits OLAP queries and reporting requirements.
