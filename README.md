@@ -258,9 +258,8 @@ print(cursor.fetchall())
 
 cursor.execute("SELECT * FROM SalesFact LIMIT 5")
 print(cursor.fetchall())
-```
 conn.close()
-
+```
 
 
 
