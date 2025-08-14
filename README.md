@@ -145,15 +145,19 @@ data_mining_project/
 ## Visualizations
 - Pairplot
  <img width="1117" height="1000" alt="iris_pairplot" src="https://github.com/user-attachments/assets/67dee35b-f7ca-455d-9477-9b87c14a3a24" />
+ 
 - correlation heatmap
 <img width="800" height="600" alt="iris_correlation_heatmap" src="https://github.com/user-attachments/assets/4d63b3c8-7de7-49a1-a789-a382636d6f3d" />
+
 - boxplots
 <img width="640" height="480" alt="iris_boxplots" src="https://github.com/user-attachments/assets/a3cfcc67-cad2-40ec-ab37-4831921b72eb" />
 
 
 
-- K-Means cluster scatter plots and elbow curve
-- <img width="800" height="600" alt="kmeans_clusters_scatter" src="https://github.com/user-attachments/assets/bd1607cf-1719-4e88-8c17-0dcb5f2fe1ef" />
+- K-Means cluster scatter plots 
+ <img width="800" height="600" alt="kmeans_clusters_scatter" src="https://github.com/user-attachments/assets/bd1607cf-1719-4e88-8c17-0dcb5f2fe1ef" />
+
+- elbow curve
 <img width="800" height="500" alt="kmeans_elbow_curve" src="https://github.com/user-attachments/assets/523af341-ab24-4c93-b077-853f925aa696" />
 
 
